@@ -1,6 +1,6 @@
 const request = require('request');
 
-let findLocation = (address) => {
+let findLocation = (address, callback) => {
     let encodedAddress = encodeURIComponent(address);
 
     request({
@@ -8,13 +8,15 @@ let findLocation = (address) => {
         json: true
     }, (error, response, body) => {
         if (error){
-            console.log('Unable to connect to google servers');
+            callback('Unable to connect to google servers', undefined);
         } else if (body.status === 'ZERO_RESULTS') {
-            console.log('Unable to find the address');
+            callback('Unable to find the address', undefined);
         }else if(body.status === 'OK'){
-            console.log(body.results[0].formatted_address);
-            console.log(body.results[0].geometry.location.lat);
-            console.log(body.results[0].geometry.location.lng);
+            callback(undefined, {
+                address: body.results[0].formatted_address,
+                latitude: body.results[0].geometry.location.lat,
+                longitude: body.results[0].geometry.location.lng
+            });
         }
         //console.log(JSON.stringify(body, undefined, 1));
     });
